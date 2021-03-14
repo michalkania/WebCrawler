@@ -9,7 +9,7 @@ namespace WebCrawle.Models
         /// <summary>
         /// List of websites to be crawled
         /// </summary>
-        public IList<TargetSite> TargetSites { get; set; }
+        public IList<Target> TargetSites { get; set; }
 
     }
 }

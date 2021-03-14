@@ -14,14 +14,14 @@ namespace Testing
         public void Create_NullUrl_Throws()
         {
             string someUrl = null;
-            TargetSite targetSite = new TargetSite(someUrl);
+            Target targetSite = new Target(someUrl);
         }
 
         [TestMethod]
         public void CheckIfEqual_True()
         {
-            TargetSite target1 = new TargetSite("https://google.com");
-            TargetSite target2 = new TargetSite("https://google.com");
+            Target target1 = new Target("https://google.com");
+            Target target2 = new Target("https://google.com");
             bool expected = true;
 
             bool actual = target1 == target2;
@@ -32,8 +32,8 @@ namespace Testing
         [TestMethod]
         public void CheckIfEqual_False()
         {
-            TargetSite target1 = new TargetSite("https://google.com");
-            TargetSite target2 = new TargetSite("https://yahoo.com");
+            Target target1 = new Target("https://google.com");
+            Target target2 = new Target("https://yahoo.com");
             bool expected = false;
 
             bool actual = target1 == target2;
@@ -44,8 +44,8 @@ namespace Testing
         [TestMethod]
         public void CheckIfDifferent_True()
         {
-            TargetSite target1 = new TargetSite("https://google.com");
-            TargetSite target2 = new TargetSite("https://yahoo.com");
+            Target target1 = new Target("https://google.com");
+            Target target2 = new Target("https://yahoo.com");
             bool expected = true;
 
             bool actual = target1 != target2;
@@ -56,8 +56,8 @@ namespace Testing
         [TestMethod]
         public void CheckIfDifferent_False()
         {
-            TargetSite target1 = new TargetSite("https://google.com");
-            TargetSite target2 = new TargetSite("https://google.com");
+            Target target1 = new Target("https://google.com");
+            Target target2 = new Target("https://google.com");
             bool expected = false;
 
             bool actual = target1 != target2;
@@ -79,7 +79,7 @@ namespace Testing
         [DataRow("http://www.yahoo.com")]
         public void Create_WithUrl_Success(string url)
         {
-            TargetSite target = new TargetSite(url);
+            Target target = new Target(url);
         }
 
         [TestMethod]
@@ -100,7 +100,7 @@ namespace Testing
         [ExpectedException(typeof(ArgumentException))]
         public void Create_WithWrongFormatUrl_Throws(string url)
         {
-            TargetSite target = new TargetSite(url);
+            Target target = new Target(url);
         }
 
         [TestMethod]
@@ -108,7 +108,7 @@ namespace Testing
         public void Create_WithNullUrl_Throws()
         {
             string url = null;
-            TargetSite target = new TargetSite(url);
+            Target target = new Target(url);
         }
 
         [TestMethod]
@@ -125,7 +125,7 @@ namespace Testing
         public void Create_WithCorrectUrlAndPath_Success(string url, string xpath)
         {
             // TODO: Write tests and validate if XPATH is actually a correct one
-            TargetSite target = new TargetSite(url, xpath);
+            Target target = new Target(url, xpath);
         }
 
         [TestMethod]
@@ -134,7 +134,7 @@ namespace Testing
         {
             string url = null;
             string xpath = "//body";
-            TargetSite target = new TargetSite(url, xpath);
+            Target target = new Target(url, xpath);
         }
 
         [TestMethod]
@@ -143,7 +143,7 @@ namespace Testing
         {
             string url = "https://google.com";
             string xpath = null;
-            TargetSite target = new TargetSite(url, xpath);
+            Target target = new Target(url, xpath);
         }
 
         #endregion
@@ -155,7 +155,7 @@ namespace Testing
         public void AddPath_Null_Throws()
         {
             string xpath = null;
-            TargetSite target = new TargetSite("https://google.com");
+            Target target = new Target("https://google.com");
             target.AddPath(xpath);
         }
 

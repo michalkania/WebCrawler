@@ -1,14 +1,18 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using System;
 using System.Collections.Generic;
 using WebCrawler.Helpers;
 
 namespace WebCrawle.Models
 {
     /// <summary>
-    /// Represents target website and scraping configuration for it
+    /// Represents a targeted website configuration and parameters
     /// </summary>
-    public class TargetSite : IEquatable<TargetSite>
+    public class Target : IEquatable<Target>
     {
+        private ILogger _logger;
+
         private string _url;
 
         /// <summary>
@@ -48,10 +52,18 @@ namespace WebCrawle.Models
         /// Represents target website and contains configuration data to be scraped from it
         /// </summary>
         /// <param name="url">Website to get the data from</param>
+        public Target(string url) : this(url, NullLoggerFactory.Instance) { }
+
+
+        /// <summary>
+        /// Represents target website and contains configuration data to be scraped from it
+        /// </summary>
+        /// <param name="url">Website to get the data from</param>
         /// <exception cref="ArgumentNullException">Url cannot be null</exception>
-        public TargetSite(string url)
+        public Target(string url, ILoggerFactory loggerFactory)
         {
             Url = url ?? throw new ArgumentNullException(nameof(url), "Url cannot be null");
+            _logger = loggerFactory.CreateLogger("Crawler Target");
         }
 
         /// <summary>
@@ -59,10 +71,9 @@ namespace WebCrawle.Models
         /// </summary>
         /// <param name="url">Website to get the data from</param>
         /// <param name="path">Path that contain data to be scraped</param>
-        /// <exception cref="ArgumentNullException">Url cannot be null</exception
-        public TargetSite(string url, string path) : this(url)
+        /// <exception cref="ArgumentNullException">Url cannot be null</exception>
+        public Target(string url, string path = null) : this(url, NullLoggerFactory.Instance)
         {
-            if (path == null) throw new ArgumentNullException(nameof(path), "Path cannot be null");
             AddPath(path);
         }
 
@@ -72,7 +83,7 @@ namespace WebCrawle.Models
         /// <param name="url">Website to get the data from</param>
         /// <param name="xpathNodes">List of paths that contain data to be scraped</param>
         /// <exception cref="ArgumentNullException">Url cannot be null</exception
-        public TargetSite(string url, IEnumerable<string> xpathNodes) : this(url)
+        public Target(string url, IEnumerable<string> xpathNodes) : this(url)
         {
             Paths = new List<string>(xpathNodes);
         }
@@ -85,12 +96,28 @@ namespace WebCrawle.Models
         /// Adds xpath to the list of nodes to get the data from
         /// </summary>
         /// <param name="xpath">Represents the path to the data</param>
-        /// <exception cref="ArgumentNullException">If given path is null</exception>
-        /// <exception cref="XPathException">When given path is not a valid xpath</exception>
         public void AddPath(string xpath)
         {
-            if (xpath == null) throw new ArgumentNullException(nameof(xpath), "Path cannot be null");
-            Paths.Add(xpath);
+            if (!String.IsNullOrEmpty(xpath))
+            {
+                Paths.Add(xpath);
+            }
+        }
+
+        /// <summary>
+        /// Adds xpaths to the list of nodes to get the data from
+        /// </summary>
+        /// <param name="xpaths">Represents a list of paths to the data</param>
+        /// <exception cref="ArgumentNullException">If path in the list is null</exception>
+        public void AddPath(IEnumerable<string> xpaths)
+        {
+            foreach (string item in xpaths)
+            {
+                if (!String.IsNullOrEmpty(item))
+                {
+                    Paths.Add(item);
+                }
+            }
         }
 
         #endregion
@@ -98,11 +125,11 @@ namespace WebCrawle.Models
         #region Comparison
 
         /// <summary>
-        /// Compares if both <see cref="TargetSite"/> target the same URL
+        /// Compares if both <see cref="Target"/> target the same URL
         /// </summary>
         /// <param name="other">Comparing with</param>
         /// <returns>If they target the same URL</returns>
-        public bool Equals(TargetSite other)
+        public bool Equals(Target other)
         {
             if (Url.Equals(other.Url))
                 return true;
@@ -111,12 +138,12 @@ namespace WebCrawle.Models
         }
 
         /// <summary>
-        /// Compares if both <see cref="TargetSite"/> target the same URL
+        /// Compares if both <see cref="Target"/> target the same URL
         /// </summary>
         /// <param name="other">Comparing with</param>
         /// <returns>If they target the same URL</returns>
-        public static bool operator ==(TargetSite left, TargetSite right) => left.Equals(right);
-        public static bool operator !=(TargetSite left, TargetSite right) => !left.Equals(right);
+        public static bool operator ==(Target left, Target right) => left.Equals(right);
+        public static bool operator !=(Target left, Target right) => !left.Equals(right);
 
         #endregion
     }

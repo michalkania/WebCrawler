@@ -18,6 +18,7 @@ namespace WebCrawler
         /// </summary>
         public CrawlerSettings Settings { get; private set; }
 
+
         #endregion
 
         #region Priv Properties/Fields
@@ -25,9 +26,11 @@ namespace WebCrawler
         /// <summary>
         /// Collection of websites to  scrape data from
         /// </summary>
-        Dictionary<string, TargetSite> _targets = new Dictionary<string, TargetSite>();
+        IDictionary<string, Target> _targets = new Dictionary<string, Target>();
 
         readonly ILogger _logger;
+
+        readonly ILoggerFactory _loggerFactory;
 
         #endregion
 
@@ -39,6 +42,7 @@ namespace WebCrawler
 
         public Crawler(ILoggerFactory log, CrawlerSettings settings)
         {
+            _loggerFactory = log;
             _logger = log.CreateLogger("Crawler") ?? NullLoggerFactory.Instance.CreateLogger("NullCrawler");
             Settings = settings ??= DefaultSettings();
             _logger.LogDebug("Created crawler object");
@@ -51,73 +55,108 @@ namespace WebCrawler
 
         #endregion
 
+        #region Priv Methods
+
+        /// <summary>
+        /// Checks if there is already a target with this name
+        /// </summary>
+        /// <param name="key">Alias or url of the website</param>
+        /// <returns>Is target in the collection?</returns>
+        private bool TargetExists(string key)
+        {
+            return _targets.ContainsKey(key);
+        }
+
+        /// <summary>
+        /// Returns <see cref="Target"/> under given name (key)
+        /// </summary>
+        /// <param name="key">Is a name or an alias for the website</param>
+        /// <exception cref="KeyNotFoundException">If the key (name or url) is not in the collection</exception>
+        private Target GetTarget(string key)
+        {
+            if (_targets.TryGetValue(key, out Target target))
+            {
+                return target;
+            }
+            else
+            {
+                throw new KeyNotFoundException($"Key has not been found in the collection of Targets for the key '{key}'");
+            }
+        }
+
+        #endregion
+
         #region API
 
         /// <summary>
         /// Adds website to the list of targets for data scraping. 
-        /// <para>[Optional] You can specify alias name (key) for this website. If no name (key) is specified then URL is used as the key.</para> 
         /// </summary>
-        /// <param name="url"></param>
-        public void AddTarget(string name, string url)
+        /// <param name="url">Website http(s) address</param>
+        /// <param name="webName">Alias name for the website</param>
+        /// <exception cref="ArgumentNullException">If url is null</exception>
+        /// <exception cref="ArgumentException">If webName is already in the dictionary of targets</exception>
+        public void AddTarget(string url, string webName = null, string xpath = null)
         {
-            name ??= url;
-            TargetSite target = new TargetSite(url);
-            _targets.Add(name, target);
-
-            _logger.LogTrace($"Target added. Name: {name}  Url: {url}");
+            webName ??= url;
+            if (String.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url), "Url cannot be null or empty");
+            if (!TargetExists(webName))
+            {
+                Target target = new Target(url, _loggerFactory);
+                _targets.Add(webName, target);
+            }
+            else
+            {
+                throw new ArgumentException(nameof(webName), "Target with the given name already exists");
+            }
         }
 
         /// <summary>
-        /// Adds website to the list of targets for data scraping. 
-        /// <para>[Optional] You can specify alias name (key) for this website. If no name (key) is specified then URL is used as the key.</para> 
+        /// Adds webstie to the list of targets for data scraping
         /// </summary>
-        /// <param name="name">Name of the website that you can use to refer to the url later on</param>
-        /// <param name="target">Object representing target website and it's scraping configuration</param>
-        public void AddTarget(string name, TargetSite target)
-        {
-            if (name == null) throw new ArgumentNullException(nameof(name), "Name cannot be null");
-            _targets.Add(name, target);
-            _logger.LogTrace($"Target added. Name: {name}  Url: {target.Url}");
-        }
-
-        /// <summary>
-        /// Adds website to the list of targets for data scraping. 
-        /// <para>[Optional] You can specify alias name (key) for this website. If no name (key) is specified then URL is used as the key.</para> 
-        /// </summary>
-        /// <param name="name">Name of the website that you can use to refer to the url later on</param>
+        /// <param name="webName">Name of the website that you can use to refer to the url later on</param>
         /// <param name="url">URL to the target website</param>
-        /// <param name="path">XPath to the element containing data to scrape</param>
-        public void AddTarget(string name, string url, string path)
+        /// <param name="xpaths">List of XPaths leading to elements containing interesting data to be scraped from the given website</param>
+        /// <exception cref="ArgumentNullException">If url is null</exception>
+        public void AddTarget(string webName, string url, IEnumerable<string> xpaths)
         {
-            name ??= url;
-            if (url == null) throw new ArgumentNullException(nameof(url), "Url cannot be null");
-            if (path == null) throw new ArgumentNullException(nameof(path), "Path cannot be null");
+            webName ??= url;
+            if (String.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url), "Url cannot be null or emtpy");
 
-            TargetSite target = new TargetSite(url, path);
-            AddTarget(name, target);
+            Target target = new Target(url, xpaths);
+            _logger.LogTrace($"Target added. Name: {webName}  Url: {url}  and multiple paths");
 
         }
 
-        public void AddTarget(string name, string url, IEnumerable<string> xpathNode)
-        {
-
-        }
-
+        /// <summary>
+        /// Adds xpath to url
+        /// </summary>
+        /// <param name="name">Name representing an alias or url of a website address </param>
+        /// <param name="xpath">Xpath to the node containing interesting data</param>
+        /// <exception cref="KeyNotFoundException">If there is no target with the given name that is an alias or an url address</exception>
         public void AddPath(string name, string xpath)
         {
-
+            Target target = GetTarget(name);
+            target.AddPath(xpath);
         }
 
         /// <summary>
-        /// Adds webstie to the target list 
+        /// Adds xpath to url
         /// </summary>
-        /// <param name="url">URL address of the website to scrape the data from</param>
-        /// <param name="dataNodes">XPath to the node containing interesting data</param>
-        public void AddPath(string name, IEnumerable<string> xpathNode)
+        /// <param name="name">URL address of the website to scrape the data from</param>
+        /// <param name="xpaths">Xpaths to the nodes containing interesting data</param>
+        /// <exception cref="KeyNotFoundException">If there is no target with the given name that is an alias or an url address</exception>
+        public void AddPath(string name, IEnumerable<string> xpaths)
         {
-            TargetSite target = new TargetSite(name);
+            Target target = GetTarget(name);
+            foreach (string path in xpaths)
+            {
+                AddPath(name, path);
+            }
         }
 
+        /// <summary>
+        /// Returns all alias/url keys representing the target websites
+        /// </summary>
         public IEnumerable<string> GetTargetNames()
         {
             return _targets.Keys;
