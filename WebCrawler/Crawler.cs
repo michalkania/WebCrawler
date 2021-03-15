@@ -18,6 +18,7 @@ namespace WebCrawler
         /// </summary>
         public CrawlerSettings Settings { get; private set; }
 
+        internal static ILoggerFactory LoggerFactory { get; private set; }
 
         #endregion
 
@@ -30,8 +31,6 @@ namespace WebCrawler
 
         readonly ILogger _logger;
 
-        readonly ILoggerFactory _loggerFactory;
-
         #endregion
 
         #region Initialization
@@ -42,10 +41,10 @@ namespace WebCrawler
 
         public Crawler(ILoggerFactory log, CrawlerSettings settings)
         {
-            _loggerFactory = log;
-            _logger = log.CreateLogger("Crawler") ?? NullLoggerFactory.Instance.CreateLogger("NullCrawler");
+            LoggerFactory = log;
+            _logger = LoggerFactory.CreateLogger("Crawler") ?? NullLoggerFactory.Instance.CreateLogger("NullCrawler");
             Settings = settings ??= DefaultSettings();
-            _logger.LogDebug("Created crawler object");
+            _logger.LogDebug("Crawler has been created");
         }
 
         private CrawlerSettings DefaultSettings()
@@ -101,7 +100,7 @@ namespace WebCrawler
             if (String.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url), "Url cannot be null or empty");
             if (!TargetExists(webName))
             {
-                Target target = new Target(url, _loggerFactory);
+                Target target = new Target(url, LoggerFactory);
                 _targets.Add(webName, target);
             }
             else
