@@ -28,24 +28,15 @@ namespace WebCrawler
         /// </summary>
         IDictionary<string, Target> _targets = new Dictionary<string, Target>();
 
-        readonly ILogger _logger;
-
-        readonly ILoggerFactory _loggerFactory;
-
         #endregion
 
         #region Initialization
 
-        public Crawler() : this(NullLoggerFactory.Instance) { }
+        public Crawler() : this(null) { }
 
-        public Crawler(ILoggerFactory log) : this(log, null) { }
-
-        public Crawler(ILoggerFactory log, CrawlerSettings settings)
+        public Crawler(CrawlerSettings settings)
         {
-            _loggerFactory = log;
-            _logger = log.CreateLogger("Crawler") ?? NullLoggerFactory.Instance.CreateLogger("NullCrawler");
             Settings = settings ??= DefaultSettings();
-            _logger.LogDebug("Created crawler object");
         }
 
         private CrawlerSettings DefaultSettings()
@@ -101,7 +92,7 @@ namespace WebCrawler
             if (String.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url), "Url cannot be null or empty");
             if (!TargetExists(webName))
             {
-                Target target = new Target(url, _loggerFactory);
+                Target target = new Target(url);
                 _targets.Add(webName, target);
             }
             else
@@ -123,7 +114,6 @@ namespace WebCrawler
             if (String.IsNullOrEmpty(url)) throw new ArgumentNullException(nameof(url), "Url cannot be null or emtpy");
 
             Target target = new Target(url, xpaths);
-            _logger.LogTrace($"Target added. Name: {webName}  Url: {url}  and multiple paths");
 
         }
 

@@ -11,8 +11,6 @@ namespace WebCrawle.Models
     /// </summary>
     public class Target : IEquatable<Target>
     {
-        private ILogger _logger;
-
         private string _url;
 
         /// <summary>
@@ -52,18 +50,10 @@ namespace WebCrawle.Models
         /// Represents target website and contains configuration data to be scraped from it
         /// </summary>
         /// <param name="url">Website to get the data from</param>
-        public Target(string url) : this(url, NullLoggerFactory.Instance) { }
-
-
-        /// <summary>
-        /// Represents target website and contains configuration data to be scraped from it
-        /// </summary>
-        /// <param name="url">Website to get the data from</param>
         /// <exception cref="ArgumentNullException">Url cannot be null</exception>
-        public Target(string url, ILoggerFactory loggerFactory)
+        public Target(string url)
         {
             Url = url ?? throw new ArgumentNullException(nameof(url), "Url cannot be null");
-            _logger = loggerFactory.CreateLogger("Crawler Target");
         }
 
         /// <summary>
@@ -72,7 +62,7 @@ namespace WebCrawle.Models
         /// <param name="url">Website to get the data from</param>
         /// <param name="path">Path that contain data to be scraped</param>
         /// <exception cref="ArgumentNullException">Url cannot be null</exception>
-        public Target(string url, string path = null) : this(url, NullLoggerFactory.Instance)
+        public Target(string url, string path = null) : this(url)
         {
             AddPath(path);
         }
