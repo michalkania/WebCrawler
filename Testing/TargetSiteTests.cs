@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using WebCrawle.Models;
+using WebCrawler.Models;
 
 namespace Testing
 {
@@ -125,7 +125,8 @@ namespace Testing
         public void Create_WithCorrectUrlAndPath_Success(string url, string xpath)
         {
             // TODO: Write tests and validate if XPATH is actually a correct one
-            Target target = new Target(url, xpath);
+            Assert.Fail();
+            //Target target = new Target(url, xpath);
         }
 
         [TestMethod]

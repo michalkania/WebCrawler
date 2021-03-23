@@ -1,5 +1,5 @@
 ﻿using System;
-using WebCrawle.Models;
+using WebCrawler.Models;
 
 namespace WebCrawler
 {

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using WebCrawler.Models;
 
-namespace WebCrawle.Models
+namespace WebCrawler.Models
 {
     public class CrawlerList
     {

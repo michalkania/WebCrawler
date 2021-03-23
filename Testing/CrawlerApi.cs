@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using WebCrawle.Models;
+using WebCrawler.Models;
 using WebCrawler;
 
 namespace Testing

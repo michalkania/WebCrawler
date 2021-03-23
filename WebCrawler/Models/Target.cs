@@ -4,13 +4,18 @@ using System;
 using System.Collections.Generic;
 using WebCrawler.Helpers;
 
-namespace WebCrawle.Models
+namespace WebCrawler.Models
 {
     /// <summary>
     /// Represents a targeted website configuration and parameters
     /// </summary>
     public class Target : IEquatable<Target>
     {
+        /// <summary>
+        /// Alias name for the target
+        /// </summary>
+        public string Name { get; set; }
+
         private string _url;
 
         /// <summary>
@@ -33,6 +38,11 @@ namespace WebCrawle.Models
                 }
             }
         }
+
+        /// <summary>
+        /// If not null. Then the results will be appended to the file with this file name.
+        /// </summary>
+        public string FileName { get; set; }
 
         /// <summary>
         /// Website address as a <see cref="Uri"/>
@@ -60,11 +70,11 @@ namespace WebCrawle.Models
         /// Represents target website and contains configuration data to be scraped from it
         /// </summary>
         /// <param name="url">Website to get the data from</param>
-        /// <param name="path">Path that contain data to be scraped</param>
+        /// <param name="filename">Name of the file to which results should be appended</param>
         /// <exception cref="ArgumentNullException">Url cannot be null</exception>
-        public Target(string url, string path = null) : this(url)
+        public Target(string url, string filename = null) : this(url)
         {
-            AddPath(path);
+            FileName = filename;
         }
 
         /// <summary>

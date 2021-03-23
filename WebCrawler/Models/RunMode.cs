@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace WebCrawle.Models
+namespace WebCrawler.Models
 {
     /// <summary>
     /// How crawler will handle current execution
