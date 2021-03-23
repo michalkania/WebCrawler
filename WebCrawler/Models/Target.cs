@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using WebCrawler.Helpers;
 
@@ -11,11 +9,6 @@ namespace WebCrawler.Models
     /// </summary>
     public class Target : IEquatable<Target>
     {
-        /// <summary>
-        /// Alias name for the target
-        /// </summary>
-        public string Name { get; set; }
-
         private string _url;
 
         /// <summary>
@@ -39,6 +32,10 @@ namespace WebCrawler.Models
             }
         }
 
+        /// <summary>
+        /// Alias name for the target
+        /// </summary>
+        public string Name { get; set; }
         /// <summary>
         /// If not null. Then the results will be appended to the file with this file name.
         /// </summary>

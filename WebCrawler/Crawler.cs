@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using WebCrawler.Models;
 
 namespace WebCrawler
@@ -14,20 +11,11 @@ namespace WebCrawler
     /// </remarks>
     public class Crawler
     {
-        #region Pub Properties
-
-        /// <summary>
-        /// Crawler's behavior
-        /// </summary>
         public CrawlerSettings Settings { get; private set; }
 
-        #endregion
+        TargetManager _targetManager;
 
-        #region Priv Properties
-
-        TargetManager targetManager { get; }
-
-        #endregion
+        IHttpCrawlerClient _client;
 
         #region Initialization
 

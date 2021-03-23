@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using WebCrawler.Models;
 
 namespace WebCrawler.Models
 {
